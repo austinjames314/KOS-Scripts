@@ -4,16 +4,18 @@ SET n TO NEXTNODE.
 //SET ve TO 
 
 ///Fix this (use tsiolkovsky equation)
-set burn_duration to nd:deltav:mag/max_acc.
-wait until nd:eta <= (burn_duration/2 + 60).
+SET t TO ship:mass*(1-1/(CONSTANT:E^(nv:mag/ve))) / (ship:maxthrust/ve)
 
-set np to nd:deltav. //points to node, don't care about the roll direction.
-lock steering to np.
+set burn_duration to nd:deltav:mag/max_acc.
+wait until n:eta <= (burn_duration/2 + 60).
+
+set nv to n:deltav. //points to node, don't care about the roll direction.
+lock steering to nv.
 
 
 
 //the ship is facing the right direction, let's wait for our burn time
-wait until nd:eta <= (burn_duration/2).
+wait until n:eta <= (burn_duration/2).
 
 //we only need to lock throttle once to a certain variable in the beginning of the loop, and adjust only the variable itself inside it
 set tset to 0.
@@ -21,7 +23,7 @@ lock throttle to tset.
 
 set done to False.
 //initial deltav
-set dv0 to nd:deltav.
+set dv0 to n:deltav.
 until done
 {
     //recalculate current max_acceleration, as it changes while we burn through fuel
