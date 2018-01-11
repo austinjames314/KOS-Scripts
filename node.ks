@@ -1,3 +1,20 @@
+SET n TO NEXTNODE.
+
+// Here I need to figure out how to find the ISP
+//SET ve TO 
+
+///Fix this (use tsiolkovsky equation)
+set burn_duration to nd:deltav:mag/max_acc.
+wait until nd:eta <= (burn_duration/2 + 60).
+
+set np to nd:deltav. //points to node, don't care about the roll direction.
+lock steering to np.
+
+
+
+//the ship is facing the right direction, let's wait for our burn time
+wait until nd:eta <= (burn_duration/2).
+
 //we only need to lock throttle once to a certain variable in the beginning of the loop, and adjust only the variable itself inside it
 set tset to 0.
 lock throttle to tset.
@@ -36,9 +53,7 @@ until done
         set done to True.
     }
 }
-unlock steering.
-unlock throttle.
-wait 1.
 
+unlock all.
 //set throttle to 0 just in case.
 SET SHIP:CONTROL:PILOTMAINTHROTTLE TO 0.
