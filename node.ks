@@ -1,61 +1,40 @@
+PARAMETER isp.
+
 SET n TO NEXTNODE.
+SET nv TO n:DELTAV
+SET ve TO isp*9.81.
+SET e TO CONSTANT:E.
+SET mt TO SHIP:MAXTHRUST.
+SET mfr TO mt/ve.
+SET m TO ship:Mass.
+SET dv TO nv:MAG.
+LOCK maxAcc TO mt/m.
 
-// Here I need to figure out how to find the ISP
-//SET ve TO 
+SET t TO (m - m/(e^(dv/ve))) / mfr.
+SET t2 TO (m - m/(e^((dv/2)/ve))) / mfr.
 
-///Fix this (use tsiolkovsky equation)
-SET t TO ship:mass*(1-1/(CONSTANT:E^(nv:mag/ve))) / (ship:maxthrust/ve)
+//set steering to point at the node
+//I want the y axis and the sun to be in the same plane. Needs modification to acheive this.
+LOCK STEERING TO nv.
 
-set burn_duration to nd:deltav:mag/max_acc.
-wait until n:eta <= (burn_duration/2 + 60).
+WAIT UNTIL n:ETA <= t2.
 
-set nv to n:deltav. //points to node, don't care about the roll direction.
-lock steering to nv.
+//Set throttle to max, and set to decrease at last second.
+LOCK THROTTLE TO nv:MAG/(mt/ship:Mass).
 
-
-
-//the ship is facing the right direction, let's wait for our burn time
-wait until n:eta <= (burn_duration/2).
-
-//we only need to lock throttle once to a certain variable in the beginning of the loop, and adjust only the variable itself inside it
-set tset to 0.
-lock throttle to tset.
-
-set done to False.
 //initial deltav
 set dv0 to n:deltav.
 until done
 {
-    //recalculate current max_acceleration, as it changes while we burn through fuel
-    set max_acc to ship:maxthrust/ship:mass.
-
-    //throttle is 100% until there is less than 1 second of time left to burn
-    //when there is less than 1 second - decrease the throttle linearly
-    set tset to min(nd:deltav:mag/max_acc, 1).
-
-    //here's the tricky part, we need to cut the throttle as soon as our nd:deltav and initial deltav start facing opposite directions
-    //this check is done via checking the dot product of those 2 vectors
     if vdot(dv0, nd:deltav) < 0
     {
-        print "End burn, remain dv " + round(nd:deltav:mag,1) + "m/s, vdot: " + round(vdot(dv0, nd:deltav),1).
         lock throttle to 0.
         break.
     }
-
-    //we have very little left to burn, less then 0.1m/s
-    if nd:deltav:mag < 0.1
-    {
-        print "Finalizing burn, remain dv " + round(nd:deltav:mag,1) + "m/s, vdot: " + round(vdot(dv0, nd:deltav),1).
-        //we burn slowly until our node vector starts to drift significantly from initial vector
-        //this usually means we are on point
-        wait until vdot(dv0, nd:deltav) < 0.5.
-
-        lock throttle to 0.
-        print "End burn, remain dv " + round(nd:deltav:mag,1) + "m/s, vdot: " + round(vdot(dv0, nd:deltav),1).
-        set done to True.
-    }
+    //Debug section:
+    print "throttle: " + nv:MAG/(mt/ship:Mass) + " vdot: " + vdot(dv0, nd:deltav).
+    WAIT 0.
 }
 
 unlock all.
-//set throttle to 0 just in case.
 SET SHIP:CONTROL:PILOTMAINTHROTTLE TO 0.
