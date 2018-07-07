@@ -1,0 +1,5 @@
+stage.
+LOCK THROTTLE TO 1.
+LOCK STEERING TO HEADING(90,20).
+RCS ON.
+wait until false.
