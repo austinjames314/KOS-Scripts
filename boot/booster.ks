@@ -7,10 +7,10 @@ COPYPATH("0:/land.ks", "").
 
 //Wait until current stage's liquid fuel hits 200
 
-STAGE.
-SET THROTTLE TO 0.
-WAIT 0.                         
-RCS ON.
+//STAGE.
+//SET THROTTLE TO 0.
+//WAIT 0.                         
+//RCS ON.
 
 //Pitch straight up.
 
