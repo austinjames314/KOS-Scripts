@@ -1,4 +1,4 @@
-PARAMETER isp.
+PARAMETER isp,thr.
 SET n TO NEXTNODE.
 SET dv TO n:DELTAV.
 LOCK m TO ship:Mass.
@@ -9,9 +9,9 @@ FOR r in rL {
     SET r:FOREBYTHROTTLE to TRUE.
     SET r:FOREENABLED to TRUE.
 }
-WAIT UNTIL (n:ETA + 1) <= (m - m/(CONSTANT:E^((dv:MAG/2)/(isp*9.81)))) / (SHIP:MAXTHRUST/(isp*9.81))..
+WAIT UNTIL (n:ETA + 1) <= (m - m/(CONSTANT:E^((dv:MAG/2)/(isp*9.81)))) / (thr/(isp*9.81))..
 RCS ON.
-LOCK THROTTLE TO MAX(0.051,n:DELTAV:MAG/(SHIP:MAXTHRUST/m)).
+LOCK THROTTLE TO MAX(0.051,n:DELTAV:MAG/(thr/m)).
 UNTIL FALSE{
     IF VDOT(dv, n:DELTAV) < 0{
         UNLOCK ALL.
